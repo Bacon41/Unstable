@@ -135,9 +135,9 @@ namespace Unstable
 
             gravity.X = (float)(9.8 * Math.Sin(gravityAngle));
             gravity.Y = (float)(9.8 * Math.Cos(gravityAngle));
-            world.Gravity = gravity;
+            //world.Gravity = gravity;
 
-            level1.MoveEdge(0, gravityAngle);
+            level1.MoveEdge(gravityAngle);
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
@@ -159,6 +159,7 @@ namespace Unstable
             gravityDisplay.Draw(spriteBatch);
 
             level1.Draw(spriteBatch);
+            level1.DrawText(spriteBatch, menuFont, Color.Black, new Vector2(0, 30));
 
             // Debug Printout
             spriteBatch.DrawString(menuFont, "" + gravityAngle, new Vector2(10, 10), Color.Black);
