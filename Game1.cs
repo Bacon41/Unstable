@@ -41,6 +41,8 @@ namespace Unstable
 
         DrawablePhysicsObject stickMan;
 
+        Camera camera;
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -66,6 +68,10 @@ namespace Unstable
             world = new World(gravity);
 
             level1 = new Level(world, GraphicsDevice);
+            level1.MaxGravity = 2 * (float)Math.PI / 3;
+
+            camera = new Camera(WIDTH, HEIGHT);
+            camera.Pos = new Vector2(WIDTH / 2, HEIGHT / 2);
 
             base.Initialize();
         }
@@ -113,31 +119,46 @@ namespace Unstable
                 this.Exit();
             }
 
-            if (currentKeyboard.IsKeyDown(Keys.W) || currentKeyboard.IsKeyDown(Keys.Up))
+            if (gravityAngle < level1.MaxGravity || gravityAngle > 2 * (float)Math.PI - level1.MaxGravity)
             {
-                gravityAngle = (float)Math.PI;
-            }
-            if (currentKeyboard.IsKeyDown(Keys.A) || currentKeyboard.IsKeyDown(Keys.Left))
-            {
-                gravityAngle += 2 * (float)Math.PI - (float)Math.PI / 120;
-            }
-            if (currentKeyboard.IsKeyDown(Keys.S) || currentKeyboard.IsKeyDown(Keys.Down))
-            {
-                gravityAngle = 0;
-            }
-            if (currentKeyboard.IsKeyDown(Keys.D) || currentKeyboard.IsKeyDown(Keys.Right))
-            {
-                gravityAngle += (float)Math.PI / 120;
-            }
-            gravityAngle %= 2 * (float)Math.PI;
+                if ((currentKeyboard.IsKeyDown(Keys.W) && !oldKeyboard.IsKeyDown(Keys.W))
+                    || (currentKeyboard.IsKeyDown(Keys.Up) && !oldKeyboard.IsKeyDown(Keys.Up)))
+                {
+                    gravityAngle += (float)Math.PI / 2;
+                }
+                if (currentKeyboard.IsKeyDown(Keys.A) || currentKeyboard.IsKeyDown(Keys.Left))
+                {
+                    gravityAngle += 2 * (float)Math.PI - (float)Math.PI / 120;
+                }
+                if ((currentKeyboard.IsKeyDown(Keys.S) && !oldKeyboard.IsKeyDown(Keys.S))
+                    || (currentKeyboard.IsKeyDown(Keys.Down) && !oldKeyboard.IsKeyDown(Keys.Down)))
+                {
+                    gravityAngle -= (float)Math.PI / 2;
+                }
+                if (currentKeyboard.IsKeyDown(Keys.D) || currentKeyboard.IsKeyDown(Keys.Right))
+                {
+                    gravityAngle += (float)Math.PI / 120;
+                }
+                gravityAngle %= 2 * (float)Math.PI;
+                gravityAngle = (gravityAngle < 0) ? 2 * (float)Math.PI + gravityAngle : gravityAngle;
 
-            gravityDisplay.Rotation = -gravityAngle;
+                gravityDisplay.Rotation = 0;
 
-            gravity.X = (float)(9.8 * Math.Sin(gravityAngle));
-            gravity.Y = (float)(9.8 * Math.Cos(gravityAngle));
-            //world.Gravity = gravity;
+                gravity.X = (float)(9.8 * Math.Sin(gravityAngle));
+                gravity.Y = (float)(9.8 * Math.Cos(gravityAngle));
+                world.Gravity = gravity;
+            }
+            if (gravityAngle > level1.MaxGravity && gravityAngle < (float)Math.PI)
+            {
+                gravityAngle = level1.MaxGravity - .0001f;
+            }
+            if (gravityAngle < 2 * (float)Math.PI - level1.MaxGravity && gravityAngle > (float)Math.PI)
+            {
+                gravityAngle = 2 * (float)Math.PI - level1.MaxGravity + .001f;
+            }
 
-            level1.MoveEdge(gravityAngle);
+            camera.Rotation = gravityAngle;
+            camera.Pos = stickMan.Position;
 
             world.Step((float)gameTime.ElapsedGameTime.TotalSeconds);
 
@@ -153,17 +174,17 @@ namespace Unstable
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, null, null, null, null,
+                camera.get_transformation(GraphicsDevice));
 
             stickMan.Draw(spriteBatch);
-            gravityDisplay.Draw(spriteBatch);
-
             level1.Draw(spriteBatch);
-            level1.DrawText(spriteBatch, menuFont, Color.Black, new Vector2(0, 30));
+            spriteBatch.End();
 
+            spriteBatch.Begin();
+            gravityDisplay.Draw(spriteBatch);
             // Debug Printout
             spriteBatch.DrawString(menuFont, "" + gravityAngle, new Vector2(10, 10), Color.Black);
-
             spriteBatch.End();
 
             base.Draw(gameTime);
