@@ -29,7 +29,6 @@ namespace Unstable
         Texture2D blank;
 
         List<DrawablePhysicsObject> objects;
-        float prevAngle;
 
         public float MaxGravity;
 
@@ -60,8 +59,6 @@ namespace Unstable
                 FixtureFactory.AttachEdge(terrain[i], terrain[i + 1], edges);
             }
             edges.Friction = 0.6f;
-
-            prevAngle = 0;
 
             MaxGravity = 0;
         }

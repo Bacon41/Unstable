@@ -68,7 +68,7 @@ namespace Unstable
             world = new World(gravity);
 
             level1 = new Level(world, GraphicsDevice);
-            level1.MaxGravity = 2 * (float)Math.PI / 3;
+            level1.MaxGravity = 2 * (float)Math.PI;
 
             camera = new Camera(WIDTH, HEIGHT);
             camera.Pos = new Vector2(WIDTH / 2, HEIGHT / 2);
@@ -90,7 +90,7 @@ namespace Unstable
             gravityDisplay = new GravityDisplay(Content.Load<Texture2D>("circle"), new Vector2(50, 50));
             gravityDisplay.Position = new Vector2(WIDTH - 50, HEIGHT - 50);
 
-            stickMan = new DrawablePhysicsObject(world, Content.Load<Texture2D>("white"), new Vector2(50, 50), 1);
+            stickMan = new DrawablePhysicsObject(world, Content.Load<Texture2D>("stickman"), new Vector2(50, 100), 1);
             stickMan.Position = new Vector2(300, 10);
             stickMan.body.BodyType = BodyType.Dynamic;
             stickMan.body.SleepingAllowed = false;
@@ -139,6 +139,10 @@ namespace Unstable
                 {
                     gravityAngle += (float)Math.PI / 120;
                 }
+                if (currentKeyboard.IsKeyDown(Keys.Space) && !oldKeyboard.IsKeyDown(Keys.Space))
+                {
+                    gravityAngle = 0;
+                }
                 gravityAngle %= 2 * (float)Math.PI;
                 gravityAngle = (gravityAngle < 0) ? 2 * (float)Math.PI + gravityAngle : gravityAngle;
 
@@ -156,6 +160,17 @@ namespace Unstable
             {
                 gravityAngle = 2 * (float)Math.PI - level1.MaxGravity + .001f;
             }
+
+            if (stickMan.body.LinearVelocity.Length() < .0001f)
+            {
+                if (stickMan.body.Rotation > (gravityAngle * 3 % (2 * (float)Math.PI)) + (float)Math.PI / 4
+                    || stickMan.body.Rotation < (gravityAngle * 3 % (2 * (float)Math.PI)) - (float)Math.PI / 4)
+                {
+                    stickMan.body.Rotation = -gravityAngle;
+                }
+            }
+            stickMan.body.Rotation %= 2 * (float)Math.PI;
+            stickMan.body.Rotation = (stickMan.body.Rotation < 0) ? 2 * (float)Math.PI + stickMan.body.Rotation : stickMan.body.Rotation;
 
             camera.Rotation = gravityAngle;
             camera.Pos = stickMan.Position;
@@ -185,6 +200,7 @@ namespace Unstable
             gravityDisplay.Draw(spriteBatch);
             // Debug Printout
             spriteBatch.DrawString(menuFont, "" + gravityAngle, new Vector2(10, 10), Color.Black);
+            spriteBatch.DrawString(menuFont, "" + stickMan.body.Rotation, new Vector2(10, 40), Color.Black);
             spriteBatch.End();
 
             base.Draw(gameTime);
