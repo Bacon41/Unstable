@@ -12,59 +12,85 @@ using Microsoft.Xna.Framework.Media;
 
 namespace Unstable
 {
+    /// <summary>
+    /// The class that contains all of the information for the camera's rotation, position, zoom, and related.
+    /// </summary>
     public class Camera
     {
-        protected float _zoom; // Camera Zoom
-        public Matrix _transform; // Matrix Transform
-        public Vector2 _pos; // Camera Position
-        protected float _rotation; // Camera Rotation
+        // The information needed for the camera to draw properly
+        protected float zoom;
+        public Matrix Transform;
+        public Vector2 Position;
+        protected float rotation;
 
         int WIDTH;
         int HEIGHT;
 
+        /// <summary>
+        /// The constructor that reads in the initial camera frame size and initializes the other information.
+        /// </summary>
+        /// <param name="w">Screen width.</param>
+        /// <param name="h">Screen height.</param>
         public Camera(int w, int h)
         {
-            _zoom = 0.5f;
-            _rotation = 0.0f;
-            _pos = Vector2.Zero;
+            // Saving all of the values
+            zoom = 0.5f;
+            rotation = 0.0f;
+            Position = Vector2.Zero;
 
             WIDTH = w;
             HEIGHT = h;
         }
 
-        // Sets and gets zoom
+        /// <summary>
+        /// Gets and sets the zoom.
+        /// </summary>
         public float Zoom
         {
-            get { return _zoom; }
-            set { _zoom = value; if (_zoom < 0.1f) _zoom = 0.1f; } // Negative zoom will flip image
+            // Does not allow negative zoom
+            get { return zoom; }
+            set { zoom = value; if (zoom < 0.1f) zoom = 0.1f; }
         }
 
+        /// <summary>
+        /// Gets and sets the rotation.
+        /// </summary>
         public float Rotation
         {
-            get { return _rotation; }
-            set { _rotation = value; }
+            get { return rotation; }
+            set { rotation = value; }
         }
 
-        // Auxiliary function to move the camera
-        public void Move(Vector2 amount)
+        /// <summary>
+        /// An additional way to move the camera.
+        /// </summary>
+        /// <param name="offset">The offest for the camera</param>
+        public void Move(Vector2 offset)
         {
-            _pos += amount;
+            Position += offset;
         }
-        // Get set position
+        
+        /// <summary>
+        /// Getting and setting the postition directly.
+        /// </summary>
         public Vector2 Pos
         {
-            get { return _pos; }
-            set { _pos = value; }
+            get { return Position; }
+            set { Position = value; }
         }
 
-        public Matrix get_transformation(GraphicsDevice graphicsDevice)
+        /// <summary>
+        /// The method to get the matrix that is the transformed screen based on zooms, shifts, rotations, and the like.
+        /// </summary>
+        /// <returns>The transformation matrix that is a result of the shifts and whatnot.</returns>
+        public Matrix getTransformation()
         {
-            _transform =       // Thanks to o KB o for this solution
-              Matrix.CreateTranslation(new Vector3(-_pos.X, -_pos.Y, 0)) *
+            // Calculating and returning the transformation maxtrix based on the shift, rotation, and zoom
+            Transform = Matrix.CreateTranslation(new Vector3(-Position.X, -Position.Y, 0)) *
                                          Matrix.CreateRotationZ(Rotation) *
                                          Matrix.CreateScale(new Vector3(Zoom, Zoom, 1)) *
                                          Matrix.CreateTranslation(new Vector3(WIDTH * 0.5f, HEIGHT * 0.5f, 0));
-            return _transform;
+            return Transform;
         }
     }
 }
