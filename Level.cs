@@ -35,6 +35,9 @@ namespace Unstable
         Body edges;
         Vector[] vertices;
         Texture2D blank;
+
+        Texture2D backgroundTex;
+        Rectangle backgroundRect;
         Texture2D portalTex;
         Rectangle portalRect;
         int levelNum;
@@ -81,12 +84,12 @@ namespace Unstable
         void LoadContent()
         {
             // Loading in the background music
-            background = content.Load<SoundEffect>("level" + levelNum + "back").CreateInstance();
+            background = content.Load<SoundEffect>("sounds/level" + levelNum + "back").CreateInstance();
             background.IsLooped = true;
             background.Play();
 
             // Loading in the file containing the level setup information
-            vertices = content.Load<Vector[]>("level" + levelNum);
+            vertices = content.Load<Vector[]>("levels/level" + levelNum);
 
             // Building the world edges from the loaded in file and giving them physics
             Vertices terrain = new Vertices();
@@ -103,13 +106,17 @@ namespace Unstable
             // Setting the spawn point from the file
             Spawn = new Vector2(vertices[0].X, vertices[0].Y);
 
+            // Loading in the information for the background texture, where it should go
+            backgroundTex = content.Load<Texture2D>("images/level" + levelNum + "back");
+            backgroundRect = new Rectangle(0, 0, backgroundTex.Width, backgroundTex.Height);
+
             // Loading in the information for the portal's texture, where it should go, and what sound it makes
-            portalTex = content.Load<Texture2D>("portal");
-            portalRect = new Rectangle(0, 0, vertices[1].X, vertices[1].Y);
-            teleport = content.Load<SoundEffect>("teleportEffect");
+            portalTex = content.Load<Texture2D>("images/portal");
+            portalRect = new Rectangle(vertices[1].X, vertices[1].Y, 50, 50);
+            teleport = content.Load<SoundEffect>("sounds/teleportEffect");
 
             // Setting the maximum gravity angle based on the loaded information
-            MaxGravity = (float)Math.PI / 3 * vertices[2].X;
+            MaxGravity = (float)Math.PI / 12 * vertices[2].X;
         }
 
         /// <summary>
@@ -136,12 +143,15 @@ namespace Unstable
         /// <param name="spriteBatch">The object that allows drawing.</param>
         public void Draw(SpriteBatch spriteBatch)
         {
-            // Call the method to draw all of the lines that edge the level
+            // Drawing the background
+            spriteBatch.Draw(backgroundTex, backgroundRect, Color.White);
+
+            /* Call the method to draw all of the lines that edge the level (for testing)
             for (int x = 0; x < edges.FixtureList.Count; x++)
             {
                 EdgeShape edge = (EdgeShape)edges.FixtureList[x].Shape;
                 DrawLine(spriteBatch, 5f, Color.Black, edge.Vertex1 * unitToPixel, edge.Vertex2 * unitToPixel);
-            }
+            }*/
 
             // If the portal is supported in the level, draw it
             if (vertices[2].Y == 1)

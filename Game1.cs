@@ -100,11 +100,11 @@ namespace Unstable
             menuFont = Content.Load<SpriteFont>("MenuFont");
 
             // Initializing the gravity display to show the player which direction gravity is pulling on the stickman
-            gravityDisplay = new GravityDisplay(Content.Load<Texture2D>("circle"), new Vector2(50, 50));
+            gravityDisplay = new GravityDisplay(Content.Load<Texture2D>("images/circle"), new Vector2(50, 50));
             gravityDisplay.Position = new Vector2(WIDTH - 50, HEIGHT - 50);
 
             // Creating the stickman with his initial conditions (some pulled from the level)
-            stickMan = new StickMan(world, Content.Load<Texture2D>("stickman"), new Vector2(50, 100), 1);
+            stickMan = new StickMan(world, Content.Load<Texture2D>("images/stickman"), new Vector2(25, 50), 1);
             stickMan.Position = level.Spawn;
             // Telling Farseer that the stickman can move and that its physics should always be calculated
             stickMan.body.BodyType = BodyType.Dynamic;
@@ -269,8 +269,8 @@ namespace Unstable
 
             // Drawing things to the screen that will rotate with the camera (stick man and level)
             spriteBatch.Begin(SpriteSortMode.BackToFront, BlendState.AlphaBlend, null, null, null, null, camera.getTransformation());
-            stickMan.Draw(spriteBatch);
             level.Draw(spriteBatch);
+            stickMan.Draw(spriteBatch);
             spriteBatch.End();
 
             // Drawing things to the screen that won't rotate with the camera (HUD, information text)

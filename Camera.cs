@@ -34,7 +34,7 @@ namespace Unstable
         public Camera(int w, int h)
         {
             // Saving all of the values
-            zoom = 0.5f;
+            zoom = 1f;
             rotation = 0.0f;
             Position = Vector2.Zero;
 
